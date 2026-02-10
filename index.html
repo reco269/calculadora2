@@ -1,312 +1,62 @@
-<!DOCTYPE html>
-<html lang="pt-br">
-<head>
-  <meta charset="UTF-8" />
-  <title>Calculadora PRO – Impressão 3D</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <link rel="stylesheet" href="style.css" />
-</head>
-<body>
-
-<div class="wrap">
-  <div class="card">
-
-    <header class="main-header">
-      <h1>🖨️ Calculadora PRO – Impressão 3D</h1>
-      <p class="subtitle">Versão Completa com todos os recursos</p>
-    </header>
-
-    <!-- TABS PRINCIPAIS -->
-    <div class="tabs-principal">
-      <button class="tab-btn active" data-tab="calculadora">📊 Calculadora</button>
-      <button class="tab-btn" data-tab="historico">📜 Histórico</button>
-      <button class="tab-btn" data-tab="comparacao">⚖️ Comparar</button>
-      <button class="tab-btn" data-tab="cliente">💼 Modo Cliente</button>
-    </div>
-
-    <!-- ========== ABA: CALCULADORA ========== -->
-    <div class="tab-content active" data-content="calculadora">
-
-      <!-- Templates Rápidos -->
-      <div class="templates-section">
-        <strong>⚡ Templates Rápidos:</strong>
-        <div class="templates-grid">
-          <button class="template-btn" data-template="miniatura">🎭 Miniatura</button>
-          <button class="template-btn" data-template="funcional">🏠 Funcional</button>
-          <button class="template-btn" data-template="presente">🎁 Presente</button>
-          <button class="template-btn" data-template="industrial">🔧 Industrial</button>
-        </div>
-      </div>
-
-      <!-- Modo de Cálculo -->
-      <div class="mode">
-        <button id="btnBasico" class="btn active" type="button">Modo Básico</button>
-        <button id="btnAvancado" class="btn" type="button">Modo Avançado</button>
-      </div>
-
-      <form id="calcForm" class="grid" novalidate>
-
-        <!-- BÁSICO -->
-        <div class="field">
-          <label for="peso">Filamento usado (g)</label>
-          <input id="peso" type="number" min="0" step="0.1" value="80" required>
-        </div>
-
-        <div class="field">
-          <label for="precoKg">Preço do filamento (R$/kg)</label>
-          <input id="precoKg" type="number" min="0" step="0.01" value="120" required>
-        </div>
-
-        <div class="field">
-          <label for="margem">Margem (%)</label>
-          <input id="margem" type="number" min="0" max="100" step="0.1" value="40" required>
-          <div id="alertaMargem" class="alerta" style="display:none;"></div>
-        </div>
-
-        <!-- AVANÇADO -->
-        <div id="advanced" class="advanced">
-
-          <div class="field">
-            <label for="tempoHoras">Tempo de impressão</label>
-            <div class="time-row">
-              <select id="tempoHoras"></select>
-              <select id="tempoMinutos"></select>
-            </div>
-          </div>
-
-          <div class="field full custoField">
-            <label for="custoHora">
-              Custo da impressora por hora (R$/h)
-              <span class="badge badge-custo">CUSTO</span>
-            </label>
-            <div class="input-with-btn">
-              <input id="custoHora" type="number" min="0" step="0.01" value="2.00">
-              <button type="button" id="btnCalcCusto" class="btn-icon" title="Calcular custo/hora">
-                🧮
-              </button>
-            </div>
-            <div class="hint">💡 Não sabe? Clique em 🧮 para calcular automaticamente</div>
-          </div>
-
-        </div>
-
-        <!-- VENDA -->
-        <div class="field full selling ganhoField">
-          <h2>Venda <span class="badge badge-ganho">GANHO</span></h2>
-          <div class="sell-grid">
-            <div>
-              <label for="precoFinal">Preço final que vou vender (R$)</label>
-              <input id="precoFinal" type="number" min="0" step="0.01" value="0">
-              <div id="alertaPreco" class="alerta" style="display:none;"></div>
-            </div>
-            <div class="profitBox ganhoBox">
-              <div class="t">Lucro</div>
-              <div class="v" id="outLucro">—</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Ações -->
-        <div class="field full actions">
-          <button id="btnCalcular" class="btn primary" type="submit">
-            📊 Calcular
-          </button>
-          <button id="btnSalvarCalculo" class="btn" type="button">
-            💾 Salvar no Histórico
-          </button>
-          <button id="btnRecomendado" class="btn" type="button">
-            🔄 Reset
-          </button>
-          <button id="btnLimpar" class="btn" type="button">
-            🗑️ Limpar
-          </button>
-        </div>
-
-      </form>
-
-      <!-- KPIs + Gráfico -->
-      <div class="resultados-row">
-        <div class="kpis">
-          <div class="kpi custoBox">
-            <div class="t">Custo Filamento</div>
-            <div class="v" id="outCustoFilamento">—</div>
-          </div>
-          <div class="kpi custoBox">
-            <div class="t">Custo Máquina</div>
-            <div class="v" id="outCustoMaquina">—</div>
-          </div>
-          <div class="kpi custoBox">
-            <div class="t">Custo Total</div>
-            <div class="v" id="outCusto">—</div>
-          </div>
-          <div class="kpi ganhoBox">
-            <div class="t">Preço Sugerido</div>
-            <div class="v" id="outPreco">—</div>
-          </div>
-        </div>
-        <div class="grafico-container">
-          <canvas id="graficoPizza"></canvas>
-        </div>
-      </div>
-
-    </div>
-
-    <!-- ========== ABA: HISTÓRICO ========== -->
-    <div class="tab-content" data-content="historico">
-      <div class="historico-header">
-        <h2>📜 Histórico de Cálculos</h2>
-        <button id="btnExportarCSV" class="btn">📑 Exportar CSV</button>
-      </div>
-      <div id="listaHistorico" class="lista-historico">
-        <div class="empty-state">Nenhum cálculo salvo ainda.</div>
-      </div>
-    </div>
-
-    <!-- ========== ABA: COMPARAÇÃO ========== -->
-    <div class="tab-content" data-content="comparacao">
-      <h2>⚖️ Comparar Cenários</h2>
-      <div class="comparacao-grid">
-        <div class="cenario">
-          <h3>Cenário A</h3>
-          <label>Margem (%):</label>
-          <input id="margemA" type="number" min="0" max="100" value="30">
-          <div class="resultado-cenario">
-            <div class="label">Preço:</div>
-            <div class="valor" id="precoA">—</div>
-          </div>
-          <div class="resultado-cenario">
-            <div class="label">Lucro:</div>
-            <div class="valor" id="lucroA">—</div>
-          </div>
-        </div>
-        <div class="cenario">
-          <h3>Cenário B</h3>
-          <label>Margem (%):</label>
-          <input id="margemB" type="number" min="0" max="100" value="40">
-          <div class="resultado-cenario">
-            <div class="label">Preço:</div>
-            <div class="valor" id="precoB">—</div>
-          </div>
-          <div class="resultado-cenario">
-            <div class="label">Lucro:</div>
-            <div class="valor" id="lucroB">—</div>
-          </div>
-        </div>
-        <div class="cenario">
-          <h3>Cenário C</h3>
-          <label>Margem (%):</label>
-          <input id="margemC" type="number" min="0" max="100" value="50">
-          <div class="resultado-cenario">
-            <div class="label">Preço:</div>
-            <div class="valor" id="precoC">—</div>
-          </div>
-          <div class="resultado-cenario">
-            <div class="label">Lucro:</div>
-            <div class="valor" id="lucroC">—</div>
-          </div>
-        </div>
-      </div>
-      <button id="btnCompararAgora" class="btn primary">🔍 Comparar Agora</button>
-    </div>
-
-    <!-- ========== ABA: MODO CLIENTE ========== -->
-    <div class="tab-content" data-content="cliente">
-      <div class="modo-cliente">
-        <h2>💼 Orçamento para Cliente</h2>
-        <div class="cliente-info">
-          <input id="nomeCliente" type="text" placeholder="Nome do cliente">
-          <input id="nomeProjeto" type="text" placeholder="Nome do projeto">
-        </div>
-        <div class="orcamento-visual" id="orcamentoCliente">
-          <div class="orcamento-item">
-            <span>📦 Material (filamento):</span>
-            <span id="clienteFilamento">—</span>
-          </div>
-          <div class="orcamento-item">
-            <span>🖨️ Impressão (máquina):</span>
-            <span id="clienteMaquina">—</span>
-          </div>
-          <div class="orcamento-item">
-            <span>👨‍💼 Mão de obra:</span>
-            <span id="clienteMaoObra">—</span>
-          </div>
-          <div class="orcamento-item total">
-            <span><strong>💰 Total:</strong></span>
-            <span id="clienteTotal">—</span>
-          </div>
-        </div>
-        <button id="btnGerarOrcamento" class="btn primary">📄 Gerar PDF Orçamento</button>
-      </div>
-    </div>
-
-  </div>
-</div>
-
-<!-- ========== MODAIS ========== -->
-
-<!-- Modal: Calculadora de Custo/Hora -->
-<div id="modalCalcCusto" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3>🧮 Calcular Custo por Hora</h3>
-      <button class="close-btn" data-close="modalCalcCusto">&times;</button>
-    </div>
-    <div class="modal-body">
-      <div class="field">
-        <label for="consumoW">Consumo da impressora (W)</label>
-        <input id="consumoW" type="number" value="200" min="0">
-        <div class="hint">Média: 150-300W</div>
-      </div>
-      <div class="field">
-        <label for="precoKwh">Preço do kWh (R$)</label>
-        <input id="precoKwh" type="number" value="0.80" step="0.01" min="0">
-        <div class="hint">Veja na sua conta de luz</div>
-      </div>
-      <div class="field">
-        <label for="depreciacaoHora">Depreciação/hora (R$/h)</label>
-        <input id="depreciacaoHora" type="number" value="1.00" step="0.01" min="0">
-        <div class="hint">Manutenção + desgaste</div>
-      </div>
-      <div class="field">
-        <label for="tempoMonitora">Seu tempo/hora (R$/h)</label>
-        <input id="tempoMonitora" type="number" value="0.50" step="0.01" min="0">
-        <div class="hint">Monitoramento + ajustes</div>
-      </div>
-      <div class="resultado-calc">
-        <strong>Custo total/hora:</strong>
-        <span id="custoCalculado">R$ 0,00</span>
-      </div>
-    </div>
-    <div class="modal-footer">
-      <button class="btn" data-close="modalCalcCusto">Cancelar</button>
-      <button id="btnAplicarCusto" class="btn primary">✅ Aplicar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Modal: Salvar no Histórico -->
-<div id="modalSalvarHistorico" class="modal">
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3>💾 Salvar Cálculo</h3>
-      <button class="close-btn" data-close="modalSalvarHistorico">&times;</button>
-    </div>
-    <div class="modal-body">
-      <label for="nomeCalculo">Nome do cálculo:</label>
-      <input id="nomeCalculo" type="text" placeholder="Ex: Boneco Iron Man" maxlength="50">
-    </div>
-    <div class="modal-footer">
-      <button class="btn" data-close="modalSalvarHistorico">Cancelar</button>
-      <button id="btnConfirmarSalvar" class="btn primary">💾 Salvar</button>
-    </div>
-  </div>
-</div>
-
-<!-- Toast -->
-<div id="toast" class="toast"></div>
-
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-<script src="script.js"></script>
-</body>
-</html>
+ (cd "$(git rev-parse --show-toplevel)" && git apply --3way <<'EOF' 
+diff --git a/index.html b/index.html
+index 6cb33762505a103aa3582b13da1da43befbfe796..b8af6f63dc28eb71a590f5e216e08970af3251ae 100644
+--- a/index.html
++++ b/index.html
+@@ -195,50 +195,53 @@
+         <div class="cenario">
+           <h3>Cenário C</h3>
+           <label>Margem (%):</label>
+           <input id="margemC" type="number" min="0" max="100" value="50">
+           <div class="resultado-cenario">
+             <div class="label">Preço:</div>
+             <div class="valor" id="precoC">—</div>
+           </div>
+           <div class="resultado-cenario">
+             <div class="label">Lucro:</div>
+             <div class="valor" id="lucroC">—</div>
+           </div>
+         </div>
+       </div>
+       <button id="btnCompararAgora" class="btn primary">🔍 Comparar Agora</button>
+     </div>
+ 
+     <!-- ========== ABA: MODO CLIENTE ========== -->
+     <div class="tab-content" data-content="cliente">
+       <div class="modo-cliente">
+         <h2>💼 Orçamento para Cliente</h2>
+         <div class="cliente-info">
+           <input id="nomeCliente" type="text" placeholder="Nome do cliente">
+           <input id="nomeProjeto" type="text" placeholder="Nome do projeto">
+         </div>
++        <div class="ultimo-calculo-cliente" id="ultimoCalculoCliente">
++          Último cálculo: ainda não calculado.
++        </div>
+         <div class="orcamento-visual" id="orcamentoCliente">
+           <div class="orcamento-item">
+             <span>📦 Material (filamento):</span>
+             <span id="clienteFilamento">—</span>
+           </div>
+           <div class="orcamento-item">
+             <span>🖨️ Impressão (máquina):</span>
+             <span id="clienteMaquina">—</span>
+           </div>
+           <div class="orcamento-item">
+             <span>👨‍💼 Mão de obra:</span>
+             <span id="clienteMaoObra">—</span>
+           </div>
+           <div class="orcamento-item total">
+             <span><strong>💰 Total:</strong></span>
+             <span id="clienteTotal">—</span>
+           </div>
+         </div>
+         <button id="btnGerarOrcamento" class="btn primary">📄 Gerar PDF Orçamento</button>
+       </div>
+     </div>
+ 
+   </div>
+ </div>
+ 
+ 
+EOF
+)
